@@ -1,5 +1,12 @@
 # encoding: utf-8
 
+"""
+Main module for Enki.
+"""
+
+# Import Python standard libraries
+import argparse
+import logging
 import random
 
 def random_word():
@@ -16,7 +23,7 @@ def random_word():
 
     return "".join(syl)
 
-def main():
+def main(args):
     epoch = 0
 
     lang_a = [random_word() for r in range(5)]
@@ -32,5 +39,29 @@ def main():
 
     print(lang_a)
 
+
 if __name__ == "__main__":
-    main()
+    # Define the parser for when called from command line
+    parser = argparse.ArgumentParser(description="Enki language simulation.")
+    parser.add_argument("--seed",
+        type=str,
+        help="The RNG seed, for reproducibility. Defaults to None.")
+    parser.add_argument("--debug",
+        action="store_true",
+        help="Whether to log debug information. Defaults to False.")
+    ARGS = parser.parse_args()
+
+    # Set the requested logging level (either DEBUG or INFO)
+    if ARGS.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+    # Log command-line options, if in debug
+    logging.debug(str(ARGS))
+
+    # Apply random seed, if any
+    logging.debug("Setting the RNG seed to `%s`", ARGS.seed)
+    random.seed(ARGS.seed)
+
+    main(ARGS)
