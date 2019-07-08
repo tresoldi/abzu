@@ -8,7 +8,7 @@ import csv
 import re
 import numpy as np
 
-import enki_data
+from enki import enki_data
 
 def random_vowel_inv(distr=None):
     """
@@ -80,8 +80,9 @@ def read_global_freq():
     segment frequency, so that results are more "natural".
     """
 
+    # TODO: fix path
     freqs = {}
-    with open('segment_freq.tsv') as csvfile:
+    with open('/home/tresoldi/repos/enki/enki/segment_freq.tsv') as csvfile:
         reader = csv.DictReader(csvfile, delimiter='\t')
         for line in reader:
             freqs[line['grapheme']] = float(line['frequency'])
@@ -319,7 +320,7 @@ def apply_basic_phonotactics(word):
     return word
 
 
-def main():
+def quick_test():
     param = {}
 
     print("--> random_vowel_inv()")
@@ -372,6 +373,3 @@ def main():
     for i in range(4):
         print('  l:', random_words(5, param))
     print()
-
-if __name__ == "__main__":
-    main()

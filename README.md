@@ -1,2 +1,3 @@
-# enki
-Enki system for simulating language evolution
+# Enki
+
+Enki system for simulating language evolution.
