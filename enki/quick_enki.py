@@ -10,6 +10,12 @@ import numpy as np
 
 from enki import enki_data
 
+# TODO: add note on distribution, weight first, bar-separated values later
+# TODO: add note that this has no information of segment weight
+# TODO: note that this is for a quick result, with no phonotactics
+# TODO: both here and in others, check if weight normalization is needed
+#       now that we are using numpy
+# TODO: here and in the others, add seed
 def random_vowel_inv(distr=None):
     """
     Returns a random vowel inventory.
@@ -18,8 +24,8 @@ def random_vowel_inv(distr=None):
     the inventory.
     """
 
-    # if no distribution of inventories/weights is given, build one
-    # from enki_data
+    # If no distribution of inventories, with relative weights, is provided,
+    # build one from `enki_data`.
     if not distr:
         # initialize an empty distribution
         distr = {}
@@ -30,7 +36,7 @@ def random_vowel_inv(distr=None):
         # get the ratio and copy the frequencies as `weights`
         weights = [entry[0] for entry in enki_data.VOWEL_INV]
         weight_sum = sum(weights)
-        distr['weights'] = [w/weight_sum for w in weights]
+        distr['weights'] = [weight/weight_sum for weight in weights]
 
     # get a random weighted individual
     vowel_inv = np.random.choice(
@@ -42,14 +48,14 @@ def random_vowel_inv(distr=None):
     return vowel_inv.split('|')
 
 
+# TODO: rename to maximum syllable pattern
 def random_syll_pattern(distr=None):
     """
     Returns a random syllable pattern.
     """
 
-
-    # if no distribution of inventories/weights is given, build one
-    # from enki_data
+    # If no distribution of inventories, with relative weights, is provided,
+    # build one from `enki_data`.
     if not distr:
         # initialize an empty distribution
         distr = {}
@@ -60,7 +66,7 @@ def random_syll_pattern(distr=None):
         # get the ratio and copy the frequencies as `weights`
         weights = [entry[0] for entry in enki_data.SYLL_PATTERN]
         weight_sum = sum(weights)
-        distr['weights'] = [w/weight_sum for w in weights]
+        distr['weights'] = [weight/weight_sum for weight in weights]
 
     # get a random weighted individual
     pat = np.random.choice(
@@ -72,24 +78,7 @@ def random_syll_pattern(distr=None):
     return pat
 
 
-def read_global_freq():
-    """
-    Returns global frequency distribution for segments.
-
-    This is used in the generation as a starting point for the per-language
-    segment frequency, so that results are more "natural".
-    """
-
-    # TODO: fix path
-    freqs = {}
-    with open('/home/tresoldi/repos/enki/enki/segment_freq.tsv') as csvfile:
-        reader = csv.DictReader(csvfile, delimiter='\t')
-        for line in reader:
-            freqs[line['grapheme']] = float(line['frequency'])
-
-    return freqs
-
-
+# TODO: allow without specifying syllable pattern
 def random_cons_inv(distr):
     """
     Returns a random consonant inventory from a list of possibilities.
@@ -121,6 +110,13 @@ def random_cons_inv(distr):
     return initials, medials, finals
 
 
+def random_cons_inv_from_pattern(pattern=None):
+    if not pattern:
+        pattern = random_syll_pattern()
+
+    return random_cons_inv(enki_data.CONS_INV[pattern])
+
+
 def random_phonology(inventory, param, base_freq=None):
     """
     Returns consonant and vowel inventories with random frequencies.
@@ -131,7 +127,7 @@ def random_phonology(inventory, param, base_freq=None):
 
     # load the base frequency, if it was not provided
     if not base_freq:
-        base_freq = read_global_freq()
+        base_freq = enki_data.PHONEME_FREQ
 
     # the perturbation is basically done by selecting a random number in
     # the requested range, for which we compute the lower and upper bound,
@@ -345,11 +341,6 @@ def quick_test():
             len(finals),
             pattern
             ))
-    print()
-
-    print('--> random_global_freq()')
-    base_freq = read_global_freq()
-    print('  items: %i' % len(base_freq))
     print()
 
     print('--> random_frequency()')
