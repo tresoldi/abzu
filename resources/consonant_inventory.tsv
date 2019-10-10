@@ -1,4 +1,4 @@
-ID	PATTERN_ID	INVENTORY_ID	INITIAL	MEDIAL	FINAL
+ID	PATTERN_ID	INVENTORY_ID	PATTERN	INITIAL	MEDIAL	FINAL
 1	1	1	CCCV	b|b j|d|f|g|g j|j|k|k w|m|m b|n|n j|p|p j|t|t j|w	b|b d|b t|d|f|g|j|j k|k|k n|k p|k t j|k w|kː|m|m b j|m p|m p t|n|n d|n f j|n g|n g d|n g w|nː|p|p t j|pː|t|tː|w	
 2	1	2	CCCV	b|b l|d|d w|f|f l|g|g l|h|j|k|k l|k w|l|l j|l w|m|m b|m j|n|n w|p|p f l|p j|p l|s|s f|s h|s k|s k l|s p|t|t j|w	b|b d|b l|b s t|b t|d|d p j|f|f l|g|g l|h|j|k|k n|k p|k s m|k s p|k w|kk j|kː|l|l d j|l k j|lː|m|m b|m b j|m h w|m p|m p j|m p l|m p t|n|n d|n d l|n f|n f j|n g d|n j|n k l|n k s|n k t|n l|n s|n s j|n s k|n t l|n t m|p|p l|p t|p t j|p w|pp l|pː|s|s j|s p|s t|t|t s t|t w|w	
 3	1	3	CCCV	b|b l|d|f|f l|g|h|k|k l|l|m|n|p|t	b|b d|d|f|f l|g|g m|h|k|k n|k p|kː|l|l k|m|m b|n|n d|n g d|n k l|n t m|p|p t|pp l|t|t g|t k|tː|ʔ	

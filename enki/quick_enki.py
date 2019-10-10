@@ -8,14 +8,23 @@ import csv
 import re
 import numpy as np
 
-from enki import enki_data
+# TODO: should allow homophones?
 
-# TODO: add note on distribution, weight first, bar-separated values later
-# TODO: add note that this has no information of segment weight
-# TODO: note that this is for a quick result, with no phonotactics
-# TODO: both here and in others, check if weight normalization is needed
-#       now that we are using numpy
-# TODO: here and in the others, add seed
+def read_data(filename):
+    filename = "../resources/" + filename
+
+    with open(filename) as csvfile:
+        reader = csv.DictReader(csvfile, delimiter="\t")
+        data = {row.pop("ID"):row for row in reader}
+
+    return data
+
+# TODO: rename file of consonant inventory
+VOWEL_INV = read_data("vowel_inventories.tsv")
+SYLL_PATTERN = read_data("syllable_patterns.tsv")
+CONS_INV = read_data("consonant_inventory.tsv")
+PHONEME_FREQ = read_data("phoneme_frequency.tsv")
+
 def random_vowel_inv(distr=None):
     """
     Returns a random vowel inventory.
@@ -24,61 +33,53 @@ def random_vowel_inv(distr=None):
     the inventory.
     """
 
-    # If no distribution of inventories, with relative weights, is provided,
-    # build one from `enki_data`.
+    # if no distribution of inventories/weights is given, build one
+    # from enki_data
     if not distr:
         # initialize an empty distribution
         distr = {}
 
+        # TODO: split with a zip operation
         # copy the inventories as a `pop`ulation
-        distr['pop'] = [entry[1] for entry in enki_data.VOWEL_INV]
+        distr["pop"] = [entry["VOWELS"] for entry in VOWEL_INV.values()]
 
         # get the ratio and copy the frequencies as `weights`
-        weights = [entry[0] for entry in enki_data.VOWEL_INV]
+        weights = [int(entry["FREQUENCY"]) for entry in VOWEL_INV.values()]
         weight_sum = sum(weights)
-        distr['weights'] = [weight/weight_sum for weight in weights]
+        distr["weights"] = [w / weight_sum for w in weights]
 
     # get a random weighted individual
-    vowel_inv = np.random.choice(
-        distr['pop'],
-        p=distr['weights'],
-        size=1,
-    )[0]
+    vowel_inv = np.random.choice(distr["pop"], p=distr["weights"], size=1)[0]
 
-    return vowel_inv.split('|')
+    return vowel_inv.split("|")
 
 
-# TODO: rename to maximum syllable pattern
 def random_syll_pattern(distr=None):
     """
     Returns a random syllable pattern.
     """
 
-    # If no distribution of inventories, with relative weights, is provided,
-    # build one from `enki_data`.
+    # if no distribution of inventories/weights is given, build one
+    # from enki_data
     if not distr:
         # initialize an empty distribution
         distr = {}
 
         # copy the patterns as a `pop`ulation
-        distr['pop'] = [entry[1] for entry in enki_data.SYLL_PATTERN]
+        distr["pop"] = [entry["PATTERN"] for entry in SYLL_PATTERN.values()]
 
         # get the ratio and copy the frequencies as `weights`
-        weights = [entry[0] for entry in enki_data.SYLL_PATTERN]
+        weights = [int(entry["FREQUENCY"]) for entry in SYLL_PATTERN.values()]
         weight_sum = sum(weights)
-        distr['weights'] = [weight/weight_sum for weight in weights]
+        distr["weights"] = [w / weight_sum for w in weights]
 
     # get a random weighted individual
-    pat = np.random.choice(
-        distr['pop'],
-        p=distr['weights'],
-        size=1,
-    )[0]
+    pat = np.random.choice(distr["pop"], p=distr["weights"], size=1)[0]
 
     return pat
 
 
-# TODO: allow without specifying syllable pattern
+
 def random_cons_inv(distr):
     """
     Returns a random consonant inventory from a list of possibilities.
@@ -87,34 +88,30 @@ def random_cons_inv(distr):
     # numpy.random.choice only works with 1-dimensional values,
     # so we choose the index
 
-    initials, medials, finals = distr[np.random.choice(
-        len(distr),
-        size=1
-    )[0]]
+    # TODO: add frequency here as well?
+    distr_list = [
+        [entry["INITIAL"], entry["MEDIAL"], entry["FINAL"]] for entry
+        in distr.values()
+            ]
+
+    initials, medials, finals = distr_list[np.random.choice(len(distr_list), size=1)[0]]
 
     if initials:
-        initials = initials.split('|')
+        initials = initials.split("|")
     else:
         initials = []
 
     if medials:
-        medials = medials.split('|')
+        medials = medials.split("|")
     else:
         medials = []
 
     if finals:
-        finals = finals.split('|')
+        finals = finals.split("|")
     else:
         finals = []
 
     return initials, medials, finals
-
-
-def random_cons_inv_from_pattern(pattern=None):
-    if not pattern:
-        pattern = random_syll_pattern()
-
-    return random_cons_inv(enki_data.CONS_INV[pattern])
 
 
 def random_phonology(inventory, param, base_freq=None):
@@ -123,18 +120,19 @@ def random_phonology(inventory, param, base_freq=None):
     """
 
     # load parameters
-    perturbation = param.get('perturbation', 1.5)
+    perturbation = param.get("perturbation", 1.5)
 
     # load the base frequency, if it was not provided
     if not base_freq:
-        base_freq = enki_data.PHONEME_FREQ
+        base_freq = {v["GRAPHEME"]:float(v["FREQUENCY"])
+                for v in PHONEME_FREQ.values()}
 
     # the perturbation is basically done by selecting a random number in
     # the requested range, for which we compute the lower and upper bound,
     # and taking the original frequency to that power; a pertubation of zero
     # samples in [1.0, 1.0], which means using the base_freq
-    perturb_low = 1.0 - (perturbation/2.0)
-    perturb_high = 1.0 + (perturbation/2.0)
+    perturb_low = 1.0 - (perturbation / 2.0)
+    perturb_high = 1.0 + (perturbation / 2.0)
 
     # get the mean frequency divided by 1.5, so we have something to default
     # in case of missing graphemes (especially clusters)
@@ -144,31 +142,39 @@ def random_phonology(inventory, param, base_freq=None):
 
     # compute random frequencies
     vowels = {
-        vowel : base_freq.get(vowel, default_freq) ** np.random.uniform(low=perturb_low, high=perturb_high)
-        for vowel in inventory['vowels']
+        vowel: base_freq.get(vowel, default_freq)
+        ** np.random.uniform(low=perturb_low, high=perturb_high)
+        for vowel in inventory["vowels"]
     }
 
     initials = {
-        cons : base_freq.get(cons, default_freq) ** np.random.uniform(low=perturb_low, high=perturb_high)
-        for cons in inventory['initials']
+        cons: base_freq.get(cons, default_freq)
+        ** np.random.uniform(low=perturb_low, high=perturb_high)
+        for cons in inventory["initials"]
     }
 
     medials = {
-        cons : base_freq.get(cons, default_freq) ** np.random.uniform(low=perturb_low, high=perturb_high)
-        for cons in inventory['medials']
+        cons: base_freq.get(cons, default_freq)
+        ** np.random.uniform(low=perturb_low, high=perturb_high)
+        for cons in inventory["medials"]
     }
 
     finals = {
-        cons : base_freq.get(cons, default_freq) ** np.random.uniform(low=perturb_low, high=perturb_high)
-        for cons in inventory['finals']
+        cons: base_freq.get(cons, default_freq)
+        ** np.random.uniform(low=perturb_low, high=perturb_high)
+        for cons in inventory["finals"]
     }
 
     # correct the new probabilities, so they sum 1.0
     new_inventory = {}
-    new_inventory['vowels'] = {k:v/sum(vowels.values()) for k, v in vowels.items()}
-    new_inventory['initials'] = {k:v/sum(initials.values()) for k, v in initials.items()}
-    new_inventory['medials'] = {k:v/sum(medials.values()) for k, v in medials.items()}
-    new_inventory['finals'] = {k:v/sum(finals.values()) for k, v in finals.items()}
+    new_inventory["vowels"] = {k: v / sum(vowels.values()) for k, v in vowels.items()}
+    new_inventory["initials"] = {
+        k: v / sum(initials.values()) for k, v in initials.items()
+    }
+    new_inventory["medials"] = {
+        k: v / sum(medials.values()) for k, v in medials.items()
+    }
+    new_inventory["finals"] = {k: v / sum(finals.values()) for k, v in finals.items()}
 
     return new_inventory
 
@@ -179,38 +185,41 @@ def random_words(num_words, param, seed=None):
 
     # get parameters as specified or default
     # TODO: default `no_consonant` should depend on the system entropy
-    no_cons_low = param.get('no_cons_low', 0.33)
-    no_cons_high = param.get('no_cons_high', 0.66)
-    base_syl_lambda = param.get('base_syl_lambda', 10)
-    remove_length = param.get('remove_length', 0.33)
+    no_cons_low = param.get("no_cons_low", 0.33)
+    no_cons_high = param.get("no_cons_high", 0.66)
+    base_syl_lambda = param.get("base_syl_lambda", 10)
+    remove_length = param.get("remove_length", 0.33)
 
     # get the 'phonotactics' of the language
     pattern = random_syll_pattern()
     inv = {}
-    inv['vowels'] = random_vowel_inv()
-    inv['initials'], inv['medials'], inv['finals'] = \
-        random_cons_inv(enki_data.CONS_INV[pattern])
+    inv["vowels"] = random_vowel_inv()
+    cons_distr = {key:value for key, value in CONS_INV.items()
+                if value["PATTERN"] == pattern}
+    inv["initials"], inv["medials"], inv["finals"] = random_cons_inv(
+            cons_distr
+        )
     phonology = random_phonology(inv, param)
     no_consonant = np.random.uniform(low=no_cons_low, high=no_cons_high)
 
     # cache keys/values/lengths
-    v_keys = list(phonology['vowels'].keys())
-    v_values = list(phonology['vowels'].values())
+    v_keys = list(phonology["vowels"].keys())
+    v_values = list(phonology["vowels"].values())
     v_len = len(v_keys)
     v_range = list(range(len(v_keys)))
 
-    i_keys = list(phonology['initials'].keys())
-    i_values = list(phonology['initials'].values())
+    i_keys = list(phonology["initials"].keys())
+    i_values = list(phonology["initials"].values())
     i_len = len(i_keys)
     i_range = list(range(len(i_keys)))
 
-    m_keys = list(phonology['medials'].keys())
-    m_values = list(phonology['medials'].values())
+    m_keys = list(phonology["medials"].keys())
+    m_values = list(phonology["medials"].values())
     m_len = len(m_keys)
     m_range = list(range(len(m_keys)))
 
-    f_keys = list(phonology['finals'].keys())
-    f_values = list(phonology['finals'].values())
+    f_keys = list(phonology["finals"].keys())
+    f_values = list(phonology["finals"].values())
     f_len = len(f_keys)
     f_range = list(range(len(f_keys)))
 
@@ -221,7 +230,7 @@ def random_words(num_words, param, seed=None):
         # correct for entropy by manipulating the lambda, so that languages with
         # simpler phonotactics will tend to have more syllables; we also
         # currently restrict to at most 5 syllables
-        syl_lambda = base_syl_lambda / np.sqrt(v_len+m_len)
+        syl_lambda = base_syl_lambda / np.sqrt(v_len + m_len)
         num_syl = min(np.random.poisson(syl_lambda) + 1, 5)
 
         # if we got a single syllable, increase it with another one 66% of the
@@ -251,116 +260,149 @@ def random_words(num_words, param, seed=None):
 
             # get a random final (or not) if at last syllable and if
             # finals are used
-            if syl == num_syl-1 and f_len:
+            if syl == num_syl - 1 and f_len:
                 if np.random.random() < no_consonant:
                     _ = np.random.choice(f_len, p=f_values)
                     syl_sounds.append(f_keys[_])
 
         # collect
-        words.append(' '.join(syl_sounds))
+        words.append(" ".join(syl_sounds))
 
     # apply basic, "universal", phonotactics
-    words = [
-        apply_basic_phonotactics(word)
-        for word in words]
+    words = [apply_basic_phonotactics(word) for word in words]
 
     # remove all length symbols by random decision
     if np.random.random() < remove_length:
-        words = [word.replace('ː', '') for word in words]
-
-    words = [word.replace(' ', '') for word in words]
+        words = [word.replace("ː", "") for word in words]
 
     return words
 
+
+# TODO: redo with the sound change engine later
+# TODO: make sure there is something left
 def apply_basic_phonotactics(word):
     rules = [
         # remove runs of three equal sounds, lengthening
-        [r' (.) \1 \1 ',    r'\1ː '],
+        [r" (.) \1 \1 ", r" \1ː "],
         # remove runs of two equal sounds, lengthening
-        [r' (.) \1 ',       r' \1ː '],
+        [r" (.) \1 ", r" \1ː "],
         # remove runs of two equal sounds, the first long, lengthening
-        [r' (.)ː \1 ',      r' \1ː '],
+        [r" (.)ː \1 ", r" \1ː "],
         # converts most vowel clusters to vowel+glide or glide + vowel
-        [r' (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) (i|y|ɨ|ʏ) ',
-         r' \1 j'],
-        [r' (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) (ɯ|u|ʊ) ',
-         r' \1 w'],
-        [r' (i|y|ɨ|ʏ) (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ)  ',
-         r' j \1 '],
-        [r' (ɯ|u|ʊ) (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ)  ',
-         r' w \1 '],
+        [r" (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) (i|y|ɨ|ʏ) ", r" \1 j "],
+        [r" (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) (ɯ|u|ʊ) ", r" \1 w "],
+        [r" (i|y|ɨ|ʏ) (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) ", r" j \1 "],
+        [r" (ɯ|u|ʊ) (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) ", r" w \1 "],
         # don't allow long glides
-        [r' (j|w)ː ',       r' \1 '],
+        [r" (j|w)ː ", r" \1 "],
         # remove less stable glide+vowel combinations
-        [r' (i|y|ɨ|ʏ) j ', r' \1 '],
-        [r' (ɯ|u|ʊ) w ', r' \1 '],
-        [r' j (i|y|ɨ|ʏ) ', r' \1 '],
-        [r' w (ɯ|u|ʊ) ', r' \1 '],
+        [r" (i|y|ɨ|ʏ) j ", r" \1 "],
+        [r" (ɯ|u|ʊ) w ", r" \1 "],
+        [r" j (i|y|ɨ|ʏ) ", r" \1 "],
+        [r" w (ɯ|u|ʊ) ", r" \1 "],
         # aspiration
-        [r' (p|t|k) h ',    r' \1ʰ '],
+        [r" (p|t|k) h ", r" \1ʰ "],
         # intervocalic /j/ to /ʒ/
-        [r' (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) j (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) ',
-         r' \1 ʒ \2 '],
+        [
+            r" (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) j (i|y|ɨ|ʉ|ɯ|u|ɪ|ʏ|ʊ|e|o|ɛ|ɜ|ʌ|ɔ|æ|ɐ|a|ɑ|ɒ) ",
+            r" \1 ʒ \2 ",
+        ],
+        # double j/w still left
+        [r" j j ", r" j "],
+        [r" w w ", r" w "],
+        # fix vowel length problems
+        [r" (.)ː \1ː ", r" \1ː "],
+        [r" (.) \1ː ", r" \1ː "],
+        [r" (.)ː \1 ", r" \1ː "],
+        [r" (.) \1 ", r" \1ː "],
+        # problems with glides at borders
+        [r" # w j ", r" # u j "],
+        [r" # j w ", r" # i w "],
+        [r" w j # ", r" w i # "],
+        [r" j w # ", r" j u # "],
     ]
 
     # add boundaries for manipulation
-    word = ' # %s # ' % word
+    word = " # %s # " % word
 
     # apply regexes
     for rule in rules:
         word = re.sub(rule[0], rule[1], word)
 
     # remove boundaries, strip, and return
-    word = word.replace('#', '').strip()
+    word = word.replace("#", "").strip()
 
     return word
 
 
-def quick_test():
+# TODO: implement properly
+def random_word_from_lexicon(lexicon):
+    """
+    Given a lexicon, returns a new word (neologism)
+    """
+
+    return random_words(1, {})[0]
+
+
+def main():
     param = {}
 
     print("--> random_vowel_inv()")
     for i in range(4):
-        print('  %i %s' % (i, random_vowel_inv()))
+        print("  %i %s" % (i, random_vowel_inv()))
     print()
 
     print("--> random_syll_pattern()")
     for i in range(4):
-        print('  %i %s' % (i, random_syll_pattern()))
+        print("  %i %s" % (i, random_syll_pattern()))
     print()
 
     print("--> random_cons_inv()")
     for i in range(4):
         pattern = random_syll_pattern()
-        distr = enki_data.CONS_INV[pattern]
+        distr = {key:value for key, value in CONS_INV.items()
+                if value["PATTERN"] == pattern}
         initials, medials, finals = random_cons_inv(distr)
-        print('  %i %i/%i/%i (%s)' % (
-            i,
-            len(initials),
-            len(medials),
-            len(finals),
-            pattern
-            ))
+        print(
+            "  %i %i/%i/%i (%s)"
+            % (i, len(initials), len(medials), len(finals), pattern)
+        )
     print()
 
-    print('--> random_frequency()')
+    print("--> random_global_freq()")
+    base_freq = {v["GRAPHEME"]:float(v["FREQUENCY"]) for v in
+            PHONEME_FREQ.values()}
+    print("  items: %i" % len(base_freq))
+    print()
+
+    print("--> random_frequency()")
     for i in range(4):
         pattern = random_syll_pattern()
         inv = {}
-        inv['vowels'] = random_vowel_inv()
-        inv['initials'], inv['medials'], inv['finals'] = \
-            random_cons_inv(enki_data.CONS_INV[pattern])
+        inv["vowels"] = random_vowel_inv()
+        cons_distr = {key:value for key, value in CONS_INV.items()
+                if value["PATTERN"] == pattern}
+        inv["initials"], inv["medials"], inv["finals"] = random_cons_inv(
+            cons_distr
+        )
         phonology = random_phonology(inv, param)
 
-        print('  items: %i/%i/%i/%i' % (
-            len(phonology['vowels']),
-            len(phonology['initials']),
-            len(phonology['medials']),
-            len(phonology['finals'])
-        ))
+        print(
+            "  items: %i/%i/%i/%i"
+            % (
+                len(phonology["vowels"]),
+                len(phonology["initials"]),
+                len(phonology["medials"]),
+                len(phonology["finals"]),
+            )
+        )
     print()
 
-    print('--> random_words()')
+    print("--> random_words()")
     for i in range(4):
-        print('  l:', random_words(5, param))
+        print("  l:", random_words(5, param))
     print()
+
+
+if __name__ == "__main__":
+    main()
