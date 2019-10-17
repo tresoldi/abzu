@@ -1,4 +1,4 @@
 include README.md
-include AUTHORS
+include AUTHORS.md
 include LICENSE
 include resources/*.tsv
