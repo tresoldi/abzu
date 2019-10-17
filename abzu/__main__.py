@@ -4,7 +4,7 @@
 """
 __main__.py
 
-Module for command-line execution of Enki.
+Module for command-line execution of Abzu.
 """
 
 # Import Python standard libraries
@@ -12,7 +12,7 @@ import argparse
 import logging
 import random
 
-import enki
+import abzu
 
 
 def quick_test():
@@ -20,23 +20,23 @@ def quick_test():
 
     print("--> random_vowel_inv()")
     for i in range(4):
-        print("  %i %s" % (i, enki.kiss.random_vowel_inv()))
+        print("  %i %s" % (i, abzu.kiss.random_vowel_inv()))
     print()
 
     print("--> random_syll_pattern()")
     for i in range(4):
-        print("  %i %s" % (i, enki.kiss.random_syll_pattern()))
+        print("  %i %s" % (i, abzu.kiss.random_syll_pattern()))
     print()
 
     print("--> random_cons_inv()")
     for i in range(4):
-        pattern = enki.kiss.random_syll_pattern()
+        pattern = abzu.kiss.random_syll_pattern()
         distr = {
             key: value
-            for key, value in enki.kiss.CONS_INV.items()
+            for key, value in abzu.kiss.CONS_INV.items()
             if value["PATTERN"] == pattern
         }
-        initials, medials, finals = enki.kiss.random_cons_inv(distr)
+        initials, medials, finals = abzu.kiss.random_cons_inv(distr)
         print(
             "  %i %i/%i/%i (%s)"
             % (i, len(initials), len(medials), len(finals), pattern)
@@ -45,25 +45,25 @@ def quick_test():
 
     print("--> random_global_freq()")
     base_freq = {
-        v["GRAPHEME"]: float(v["FREQUENCY"]) for v in enki.kiss.PHONEME_FREQ.values()
+        v["GRAPHEME"]: float(v["FREQUENCY"]) for v in abzu.kiss.PHONEME_FREQ.values()
     }
     print("  items: %i" % len(base_freq))
     print()
 
     print("--> random_frequency()")
     for i in range(4):
-        pattern = enki.kiss.random_syll_pattern()
+        pattern = abzu.kiss.random_syll_pattern()
         inv = {}
-        inv["vowels"] = enki.kiss.random_vowel_inv()
+        inv["vowels"] = abzu.kiss.random_vowel_inv()
         cons_distr = {
             key: value
-            for key, value in enki.kiss.CONS_INV.items()
+            for key, value in abzu.kiss.CONS_INV.items()
             if value["PATTERN"] == pattern
         }
-        inv["initials"], inv["medials"], inv["finals"] = enki.kiss.random_cons_inv(
+        inv["initials"], inv["medials"], inv["finals"] = abzu.kiss.random_cons_inv(
             cons_distr
         )
-        phonology = enki.kiss.random_phonology(inv, param)
+        phonology = abzu.kiss.random_phonology(inv, param)
 
         print(
             "  items: %i/%i/%i/%i"
@@ -78,21 +78,21 @@ def quick_test():
 
     print("--> random_words()")
     for i in range(4):
-        print("  l:", enki.kiss.random_words(15, param))
+        print("  l:", abzu.kiss.random_words(15, param))
     print()
 
 
 def full_test(args):
     epoch = 0
 
-    lang_a = enki.textgen.random_labels(5)
+    lang_a = abzu.textgen.random_labels(5)
     print("Creating random langs at epoch 0")
     print(lang_a)
 
     for i in range(10):
         epoch += 1
         if random.randint(0, 10) == 7:
-            w = enki.textgen.random_labels(1)[0]
+            w = abzu.textgen.random_labels(1)[0]
             lang_a[random.randint(0, len(lang_a) - 1)] = w
             print("Random new word in lang_a at epoch %i" % epoch)
 
@@ -102,16 +102,16 @@ def full_test(args):
 
 
 def entry(args):
-    print("Language: %s" % enki.textgen.random_labels(1, args.seed)[0])
+    print("Language: %s" % abzu.textgen.random_labels(1, args.seed)[0])
     for idx, word in enumerate(
-        enki.kiss.random_words(args.size, param={}, seed=args.seed)
+        abzu.kiss.random_words(args.size, param={}, seed=args.seed)
     ):
         print("  %i:\t%s" % (idx + 1, word))
 
 
 def main():
     # Define the parser for when called from command line
-    parser = argparse.ArgumentParser(description="Enki language simulation.")
+    parser = argparse.ArgumentParser(description="Abzu language simulation.")
     parser.add_argument(
         "--seed", type=str, help="The RNG seed, for reproducibility. Defaults to None."
     )

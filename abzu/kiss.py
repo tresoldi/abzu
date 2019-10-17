@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 """
-Simpler and (almost) self-contained version of Enki.
+Simpler and (almost) self-contained version of Abzu.
 
 Intended as a "Keep It Simple, Stupid" version.
 """
@@ -61,7 +61,7 @@ def random_vowel_inv(distr=None, seed=None):
     """
 
     # if no distribution of inventories/weights is given, build one
-    # from enki_data
+    # from abzu_data
     if not distr:
         # initialize an empty distribution
         distr = {}
@@ -91,7 +91,7 @@ def random_syll_pattern(distr=None, seed=None):
     """
 
     # if no distribution of inventories/weights is given, build one
-    # from enki_data
+    # from abzu_data
     if not distr:
         # initialize an empty distribution
         distr = {}
@@ -175,7 +175,7 @@ def random_phonology(inventory, param, base_freq=None, seed=None):
     # get the mean frequency divided by 1.5, so we have something to default
     # in case of missing graphemes (especially clusters)
     # TODO: this is applying to all clusters right now, as we have a space
-    #       between the graphemes in enki_data but not in phoible
+    #       between the graphemes in abzu_data but not in phoible
     default_freq = np.mean(list(base_freq.values())) / 1.5
 
     # compute random frequencies

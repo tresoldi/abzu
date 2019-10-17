@@ -1,23 +1,25 @@
-# Enki
+# Abzu 
 
 [![Build Status](https://travis-ci.org/tresoldi/enki.svg?branch=master)](https://travis-ci.org/tresoldi/enki)
 [![codecov](https://codecov.io/gh/tresoldi/enki/branch/master/graph/badge.svg?token=o5ntv3ssOH)](https://codecov.io/gh/tresoldi/enki)
 
-Enki system for simulating language evolution, which used the
+Abzu system for simulating language evolution, which used the
 [ngesh](https://github.com/tresoldi/ngesh) and
 [alteruphono](https://github.com/tresoldi/alteruphono) libraries.
-It is named after
+It is named after the
+[underground aquifers](https://en.wikipedia.org/wiki/Abzu) that were the
+domais of
 [Enki](https://en.wikipedia.org/wiki/Enki), the Sumerian god of language and
 confusion.
 
-*Please remember that `enki` is a work-in-progress.*
+*Please remember that `abzu` is a work-in-progress.*
 
 ## Installation
 
-In any standard Python environment, `enki` can be installed with:
+In any standard Python environment, `abzu` can be installed with:
 
 ```
-pip install enki
+pip install abzu
 ```
 
 The `pip` instalation will also fetch dependencies, such as `ngesh` and
@@ -28,13 +30,13 @@ recommended.
 
 The library is under development, and the best way to understand its
 usage is to follow the
-[tests](https://github.com/tresoldi/enki/blob/master/tests/test_enki.py).
+[tests](https://github.com/tresoldi/abzu/blob/master/tests/test_abzu.py).
 
 A quick generation of a vocabulary following a random phonological
 system can be performed from the command-line:
 
 ```
-$ enki
+$ abzu
 Language: Aburo
   1:    oː e
   2:    i ŋ ẽ
@@ -52,7 +54,7 @@ The utility accepts `size` (indicating the number of words in the
 vocabulary) and `seed` (for reproducibility) parameters:
 
 ```
-$ enki --size 15 --seed jena
+$ abzu --size 15 --seed jena
 Language: Rafvo
   1:    a m ã
   2:    e m e ɔ n ɨ n
@@ -77,18 +79,18 @@ Language: Rafvo
 
 ## How to cite
 
-If you use `enki`, please cite it as:
+If you use `abzu`, please cite it as:
 
 > Tresoldi, Tiago (2019). Enki, a system for simulating language evolution.
-Version 0.0.1dev. Jena. Available at https://github.com/tresoldi/enki
+Version 0.0.1dev. Jena. Available at https://github.com/tresoldi/abzu
 
 In BibTex:
 
 ```
-@misc{Tresoldi2019enki,
+@misc{Tresoldi2019abzu,
   author = {Tresoldi, Tiago},
-  title = {Enki, a system for simulating language evolution},
-  howpublished = {\url{https://github.com/tresoldi/enki}},
+  title = {Abzu, a system for simulating language evolution},
+  howpublished = {\url{https://github.com/tresoldi/abzu}},
   address = {Jena},
   year = {2019},
 }
