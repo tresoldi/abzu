@@ -8,22 +8,31 @@ import csv
 import re
 import numpy as np
 
+from os import path
+
+# Set the resource directory; this is sage as we already added
+# `zip_safe=False` to setup.py
+_RESOURCE_DIR = path.join(path.dirname(path.dirname(__file__)), "resources")
+
 # TODO: should allow homophones?
 
+
 def read_data(filename):
-    filename = "../resources/" + filename
+    filename = path.join(_RESOURCE_DIR, filename)
 
     with open(filename) as csvfile:
         reader = csv.DictReader(csvfile, delimiter="\t")
-        data = {row.pop("ID"):row for row in reader}
+        data = {row.pop("ID"): row for row in reader}
 
     return data
+
 
 # TODO: rename file of consonant inventory
 VOWEL_INV = read_data("vowel_inventories.tsv")
 SYLL_PATTERN = read_data("syllable_patterns.tsv")
 CONS_INV = read_data("consonant_inventory.tsv")
 PHONEME_FREQ = read_data("phoneme_frequency.tsv")
+
 
 def random_vowel_inv(distr=None):
     """
@@ -79,7 +88,6 @@ def random_syll_pattern(distr=None):
     return pat
 
 
-
 def random_cons_inv(distr):
     """
     Returns a random consonant inventory from a list of possibilities.
@@ -90,9 +98,8 @@ def random_cons_inv(distr):
 
     # TODO: add frequency here as well?
     distr_list = [
-        [entry["INITIAL"], entry["MEDIAL"], entry["FINAL"]] for entry
-        in distr.values()
-            ]
+        [entry["INITIAL"], entry["MEDIAL"], entry["FINAL"]] for entry in distr.values()
+    ]
 
     initials, medials, finals = distr_list[np.random.choice(len(distr_list), size=1)[0]]
 
@@ -124,8 +131,9 @@ def random_phonology(inventory, param, base_freq=None):
 
     # load the base frequency, if it was not provided
     if not base_freq:
-        base_freq = {v["GRAPHEME"]:float(v["FREQUENCY"])
-                for v in PHONEME_FREQ.values()}
+        base_freq = {
+            v["GRAPHEME"]: float(v["FREQUENCY"]) for v in PHONEME_FREQ.values()
+        }
 
     # the perturbation is basically done by selecting a random number in
     # the requested range, for which we compute the lower and upper bound,
@@ -194,11 +202,10 @@ def random_words(num_words, param, seed=None):
     pattern = random_syll_pattern()
     inv = {}
     inv["vowels"] = random_vowel_inv()
-    cons_distr = {key:value for key, value in CONS_INV.items()
-                if value["PATTERN"] == pattern}
-    inv["initials"], inv["medials"], inv["finals"] = random_cons_inv(
-            cons_distr
-        )
+    cons_distr = {
+        key: value for key, value in CONS_INV.items() if value["PATTERN"] == pattern
+    }
+    inv["initials"], inv["medials"], inv["finals"] = random_cons_inv(cons_distr)
     phonology = random_phonology(inv, param)
     no_consonant = np.random.uniform(low=no_cons_low, high=no_cons_high)
 
@@ -360,8 +367,9 @@ def main():
     print("--> random_cons_inv()")
     for i in range(4):
         pattern = random_syll_pattern()
-        distr = {key:value for key, value in CONS_INV.items()
-                if value["PATTERN"] == pattern}
+        distr = {
+            key: value for key, value in CONS_INV.items() if value["PATTERN"] == pattern
+        }
         initials, medials, finals = random_cons_inv(distr)
         print(
             "  %i %i/%i/%i (%s)"
@@ -370,8 +378,7 @@ def main():
     print()
 
     print("--> random_global_freq()")
-    base_freq = {v["GRAPHEME"]:float(v["FREQUENCY"]) for v in
-            PHONEME_FREQ.values()}
+    base_freq = {v["GRAPHEME"]: float(v["FREQUENCY"]) for v in PHONEME_FREQ.values()}
     print("  items: %i" % len(base_freq))
     print()
 
@@ -380,11 +387,10 @@ def main():
         pattern = random_syll_pattern()
         inv = {}
         inv["vowels"] = random_vowel_inv()
-        cons_distr = {key:value for key, value in CONS_INV.items()
-                if value["PATTERN"] == pattern}
-        inv["initials"], inv["medials"], inv["finals"] = random_cons_inv(
-            cons_distr
-        )
+        cons_distr = {
+            key: value for key, value in CONS_INV.items() if value["PATTERN"] == pattern
+        }
+        inv["initials"], inv["medials"], inv["finals"] = random_cons_inv(cons_distr)
         phonology = random_phonology(inv, param)
 
         print(

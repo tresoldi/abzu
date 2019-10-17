@@ -9,6 +9,7 @@ __email__ = "tresoldi@shh.mpg.de"
 from enki.quick_enki import random_vowel_inv
 from enki.quick_enki import random_syll_pattern
 from enki.quick_enki import random_cons_inv
-from enki.quick_enki import random_cons_inv_from_pattern
 
-from enki.quick_enki import quick_test
+# from enki.quick_enki import random_cons_inv_from_pattern
+
+# from enki.quick_enki import quick_test

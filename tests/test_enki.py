@@ -12,7 +12,8 @@ Tests for the `enki` package.
 import unittest
 
 # Import the library being tested
-#import enki
+import enki
+
 
 class TestEnki(unittest.TestCase):
     """
@@ -21,3 +22,6 @@ class TestEnki(unittest.TestCase):
 
     def test_temp(self):
         assert 2 + 2 == 4
+
+    def test_quick(self):
+        enki.quick_enki.main()

@@ -23,17 +23,12 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    packages=["enki"],
+    packages=["enki", "resources"],
     keywords=["language", "evolution", "simulation", "conlang"],
     include_package_data=True,
-    install_requires=[
-        "numpy",
-    ],
-    entry_points={
-        "console_scripts": [
-            "enki=enki.__main__:main",
-        ]
-    },
+    install_requires=["alteruphono", "numpy"],
+    entry_points={"console_scripts": ["enki=enki.__main__:main"]},
     test_suite="tests",
     tests_require=[],
+    zip_safe=False,
 )

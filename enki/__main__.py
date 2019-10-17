@@ -4,7 +4,7 @@
 """
 __main__.py
 
-Module for command-lien execution of Enki.
+Module for command-line execution of Enki.
 """
 
 # Import Python standard libraries
@@ -13,6 +13,7 @@ import logging
 import random
 
 import enki
+
 
 def random_word():
     c = "kgtdszfvpb"
@@ -23,10 +24,11 @@ def random_word():
         random.choice(v),
         random.choice(c),
         random.choice(v),
-        random.choice(c)
+        random.choice(c),
     ]
 
     return "".join(syl)
+
 
 def entry(args):
     epoch = 0
@@ -39,24 +41,25 @@ def entry(args):
         epoch += 1
         if random.randint(0, 10) == 7:
             w = random_word()
-            lang_a[random.randint(0, len(lang_a)-1)] = w
+            lang_a[random.randint(0, len(lang_a) - 1)] = w
             print("Random new word in lang_a at epoch %i" % epoch)
 
     print(lang_a)
 
-    enki.quick_test()
+    enki.quick_enki.main()
 
 
 def main():
     # Define the parser for when called from command line
-    parser = argparse.ArgumentParser(
-            description="Enki language simulation.")
-    parser.add_argument("--seed",
-        type=str,
-        help="The RNG seed, for reproducibility. Defaults to None.")
-    parser.add_argument("--debug",
+    parser = argparse.ArgumentParser(description="Enki language simulation.")
+    parser.add_argument(
+        "--seed", type=str, help="The RNG seed, for reproducibility. Defaults to None."
+    )
+    parser.add_argument(
+        "--debug",
         action="store_true",
-        help="Whether to log debug information. Defaults to False.")
+        help="Whether to log debug information. Defaults to False.",
+    )
     ARGS = parser.parse_args()
 
     # Set the requested logging level (either DEBUG or INFO)

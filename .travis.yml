@@ -1,15 +1,14 @@
 language: python
 
 python:
-    - "3.5"
+  - "3.5"
 
 install:
-    - "python setup.py install"
-    - "pip install codecov"
+  - "python setup.py install"
+  - "pip install codecov"
 
 script:
-    - "coverage run tests/test_enki.py"
+  - "coverage run tests/test_enki.py"
 
 after_success:
-    - "codecov"
-
+  - "codecov"
