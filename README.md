@@ -52,7 +52,7 @@ The utility accepts `size` (indicating the number of words in the
 vocabulary) and `seed` (for reproducibility) parameters:
 
 ```
-(env) tresoldi@shh.mpg.de@dlt5802808l:~/src/enki$ enki --size 15 --seed jena
+$ enki --size 15 --seed jena
 Language: Rafvo
   1:    a m ã
   2:    e m e ɔ n ɨ n
