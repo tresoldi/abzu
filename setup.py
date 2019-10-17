@@ -26,7 +26,7 @@ setup(
     packages=["enki", "resources"],
     keywords=["language", "evolution", "simulation", "conlang"],
     include_package_data=True,
-    install_requires=["alteruphono", "numpy"],
+    install_requires=["alteruphono", "ngesh", "numpy"],
     entry_points={"console_scripts": ["enki=enki.__main__:main"]},
     test_suite="tests",
     tests_require=[],
