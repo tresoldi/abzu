@@ -80,7 +80,7 @@ Language: Rafvo
 If you use `enki`, please cite it as:
 
 > Tresoldi, Tiago (2019). Enki, a system for simulating language evolution.
-Version 0.0.1dev. Jena. Available at [https://github.com/tresoldi/enki]
+Version 0.0.1dev. Jena. Available at https://github.com/tresoldi/enki
 
 In BibTex:
 
