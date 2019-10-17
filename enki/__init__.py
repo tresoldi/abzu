@@ -7,3 +7,5 @@ __email__ = "tresoldi@shh.mpg.de"
 
 # Build the namespace
 from . import kiss
+
+from .textgen import random_labels, random_species
