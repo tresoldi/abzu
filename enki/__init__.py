@@ -1,7 +1,7 @@
 # __init__.py
 
 # Version of the package
-__version__ = "0.0.1dev"
+__version__ = "0.0.1dev0"
 __author__ = "Tiago Tresoldi"
 __email__ = "tresoldi@shh.mpg.de"
 

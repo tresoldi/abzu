@@ -11,7 +11,7 @@ README_FILE = (LOCAL_PATH / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="enki",
-    version="0.0.1dev",
+    version="0.0.1dev0",
     description="System for the simulation of language evolution",
     long_description=README_FILE,
     long_description_content_type="text/markdown",
