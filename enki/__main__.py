@@ -78,11 +78,11 @@ def quick_test():
 
     print("--> random_words()")
     for i in range(4):
-        print("  l:", enki.kiss.random_words(5, param))
+        print("  l:", enki.kiss.random_words(15, param))
     print()
 
 
-def entry(args):
+def full_test(args):
     epoch = 0
 
     lang_a = enki.textgen.random_labels(5)
@@ -101,6 +101,14 @@ def entry(args):
     quick_test()
 
 
+def entry(args):
+    print("Language: %s" % enki.textgen.random_labels(1, args.seed)[0])
+    for idx, word in enumerate(
+        enki.kiss.random_words(args.size, param={}, seed=args.seed)
+    ):
+        print("  %i:\t%s" % (idx + 1, word))
+
+
 def main():
     # Define the parser for when called from command line
     parser = argparse.ArgumentParser(description="Enki language simulation.")
@@ -111,6 +119,12 @@ def main():
         "--debug",
         action="store_true",
         help="Whether to log debug information. Defaults to False.",
+    )
+    parser.add_argument(
+        "--size",
+        type=int,
+        default=10,
+        help="The number of words in the vocabulary to be generated. Defaults to 10.",
     )
     ARGS = parser.parse_args()
 
