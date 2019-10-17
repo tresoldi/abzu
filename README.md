@@ -104,5 +104,3 @@ for the project [CALC](http://calc.digling.org)
 (Computer-Assisted Language Comparison: Reconciling Computational and Classical
 Approaches in Historical Linguistics), led by
 [Johann-Mattis List](http://www.lingulist.de).
-
-```
