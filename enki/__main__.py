@@ -32,7 +32,9 @@ def quick_test():
     for i in range(4):
         pattern = enki.kiss.random_syll_pattern()
         distr = {
-            key: value for key, value in enki.kiss.CONS_INV.items() if value["PATTERN"] == pattern
+            key: value
+            for key, value in enki.kiss.CONS_INV.items()
+            if value["PATTERN"] == pattern
         }
         initials, medials, finals = enki.kiss.random_cons_inv(distr)
         print(
@@ -42,7 +44,9 @@ def quick_test():
     print()
 
     print("--> random_global_freq()")
-    base_freq = {v["GRAPHEME"]: float(v["FREQUENCY"]) for v in enki.kiss.PHONEME_FREQ.values()}
+    base_freq = {
+        v["GRAPHEME"]: float(v["FREQUENCY"]) for v in enki.kiss.PHONEME_FREQ.values()
+    }
     print("  items: %i" % len(base_freq))
     print()
 
@@ -52,9 +56,13 @@ def quick_test():
         inv = {}
         inv["vowels"] = enki.kiss.random_vowel_inv()
         cons_distr = {
-            key: value for key, value in enki.kiss.CONS_INV.items() if value["PATTERN"] == pattern
+            key: value
+            for key, value in enki.kiss.CONS_INV.items()
+            if value["PATTERN"] == pattern
         }
-        inv["initials"], inv["medials"], inv["finals"] = enki.kiss.random_cons_inv(cons_distr)
+        inv["initials"], inv["medials"], inv["finals"] = enki.kiss.random_cons_inv(
+            cons_distr
+        )
         phonology = enki.kiss.random_phonology(inv, param)
 
         print(
