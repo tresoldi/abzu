@@ -148,7 +148,7 @@ def random_labels(size=1, seed=None):
 
 
 # Please note that this library was originally relying on the more
-# complex word-generator implemented in Enki, with better results and better
+# complex word-generator implemented in Abzu, with better results and better
 # code. Still, it was fun to take a break from serious work and work in
 # this pseudo-modern Latin, and we only really care about good-enough
 # labels in this case. In other words, please don't care too much about
