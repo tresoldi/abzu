@@ -2,20 +2,21 @@
 
 """
 Simpler and (almost) self-contained version of Enki.
+
+Intended as a "Keep It Simple, Stupid" version.
 """
 
+# Import Python standard libraries
 import csv
-import re
 import numpy as np
-
 from os import path
+import re
+
+# TODO: move _RESOURCE_DIR and reading to a utils.py module
 
 # Set the resource directory; this is sage as we already added
 # `zip_safe=False` to setup.py
 _RESOURCE_DIR = path.join(path.dirname(path.dirname(__file__)), "resources")
-
-# TODO: should allow homophones?
-
 
 def read_data(filename):
     filename = path.join(_RESOURCE_DIR, filename)
@@ -27,10 +28,9 @@ def read_data(filename):
     return data
 
 
-# TODO: rename file of consonant inventory
 VOWEL_INV = read_data("vowel_inventories.tsv")
 SYLL_PATTERN = read_data("syllable_patterns.tsv")
-CONS_INV = read_data("consonant_inventory.tsv")
+CONS_INV = read_data("consonant_inventories.tsv")
 PHONEME_FREQ = read_data("phoneme_frequency.tsv")
 
 
@@ -350,65 +350,3 @@ def random_word_from_lexicon(lexicon):
 
     return random_words(1, {})[0]
 
-
-def main():
-    param = {}
-
-    print("--> random_vowel_inv()")
-    for i in range(4):
-        print("  %i %s" % (i, random_vowel_inv()))
-    print()
-
-    print("--> random_syll_pattern()")
-    for i in range(4):
-        print("  %i %s" % (i, random_syll_pattern()))
-    print()
-
-    print("--> random_cons_inv()")
-    for i in range(4):
-        pattern = random_syll_pattern()
-        distr = {
-            key: value for key, value in CONS_INV.items() if value["PATTERN"] == pattern
-        }
-        initials, medials, finals = random_cons_inv(distr)
-        print(
-            "  %i %i/%i/%i (%s)"
-            % (i, len(initials), len(medials), len(finals), pattern)
-        )
-    print()
-
-    print("--> random_global_freq()")
-    base_freq = {v["GRAPHEME"]: float(v["FREQUENCY"]) for v in PHONEME_FREQ.values()}
-    print("  items: %i" % len(base_freq))
-    print()
-
-    print("--> random_frequency()")
-    for i in range(4):
-        pattern = random_syll_pattern()
-        inv = {}
-        inv["vowels"] = random_vowel_inv()
-        cons_distr = {
-            key: value for key, value in CONS_INV.items() if value["PATTERN"] == pattern
-        }
-        inv["initials"], inv["medials"], inv["finals"] = random_cons_inv(cons_distr)
-        phonology = random_phonology(inv, param)
-
-        print(
-            "  items: %i/%i/%i/%i"
-            % (
-                len(phonology["vowels"]),
-                len(phonology["initials"]),
-                len(phonology["medials"]),
-                len(phonology["finals"]),
-            )
-        )
-    print()
-
-    print("--> random_words()")
-    for i in range(4):
-        print("  l:", random_words(5, param))
-    print()
-
-
-if __name__ == "__main__":
-    main()

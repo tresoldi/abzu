@@ -30,6 +30,65 @@ def random_word():
     return "".join(syl)
 
 
+def quick_test():
+    param = {}
+
+    print("--> random_vowel_inv()")
+    for i in range(4):
+        print("  %i %s" % (i, enki.kiss.random_vowel_inv()))
+    print()
+
+    print("--> random_syll_pattern()")
+    for i in range(4):
+        print("  %i %s" % (i, enki.kiss.random_syll_pattern()))
+    print()
+
+    print("--> random_cons_inv()")
+    for i in range(4):
+        pattern = enki.kiss.random_syll_pattern()
+        distr = {
+            key: value for key, value in enki.kiss.CONS_INV.items() if value["PATTERN"] == pattern
+        }
+        initials, medials, finals = enki.kiss.random_cons_inv(distr)
+        print(
+            "  %i %i/%i/%i (%s)"
+            % (i, len(initials), len(medials), len(finals), pattern)
+        )
+    print()
+
+    print("--> random_global_freq()")
+    base_freq = {v["GRAPHEME"]: float(v["FREQUENCY"]) for v in enki.kiss.PHONEME_FREQ.values()}
+    print("  items: %i" % len(base_freq))
+    print()
+
+    print("--> random_frequency()")
+    for i in range(4):
+        pattern = enki.kiss.random_syll_pattern()
+        inv = {}
+        inv["vowels"] = enki.kiss.random_vowel_inv()
+        cons_distr = {
+            key: value for key, value in enki.kiss.CONS_INV.items() if value["PATTERN"] == pattern
+        }
+        inv["initials"], inv["medials"], inv["finals"] = enki.kiss.random_cons_inv(cons_distr)
+        phonology = enki.kiss.random_phonology(inv, param)
+
+        print(
+            "  items: %i/%i/%i/%i"
+            % (
+                len(phonology["vowels"]),
+                len(phonology["initials"]),
+                len(phonology["medials"]),
+                len(phonology["finals"]),
+            )
+        )
+    print()
+
+    print("--> random_words()")
+    for i in range(4):
+        print("  l:", enki.kiss.random_words(5, param))
+    print()
+
+
 def entry(args):
     epoch = 0
 
@@ -46,7 +105,7 @@ def entry(args):
 
     print(lang_a)
 
-    enki.quick_enki.main()
+    quick_test()
 
 
 def main():

@@ -24,8 +24,5 @@ class TestEnki(unittest.TestCase):
     def test_temp(self):
         assert 2 + 2 == 4
 
-    def test_quick(self):
-        enki.quick_enki.main()
-
 if __name__ == "__main__":
     sys.exit(unittest.main())
