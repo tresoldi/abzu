@@ -139,22 +139,11 @@ def random_cons_inv(distr, seed=None):
     _np_seed(seed)
     initials, medials, finals = distr_list[np.random.choice(len(distr_list), size=1)[0]]
 
-    # TODO: more pythonic way? the list must be empty, only .split() does not
-    # work
-    if initials:
-        initials = initials.split("|")
-    else:
-        initials = []
-
-    if medials:
-        medials = medials.split("|")
-    else:
-        medials = []
-
-    if finals:
-        finals = finals.split("|")
-    else:
-        finals = []
+    # Split the lists of phonemes, making sure there are no empty strings
+    # in case of empty lists
+    initials = [sound for sound in initials.split("|") if sound]
+    medials = [sound for sound in medials.split("|") if sound]
+    finals = [sound for sound in finals.split("|") if sound]
 
     return initials, medials, finals
 
@@ -384,9 +373,6 @@ def apply_basic_phonotactics(word):
 
 
 # TODO: implement properly
-def random_word_from_lexicon(lexicon):
-    """
-    Given a lexicon, returns a new word (neologism)
-    """
-
+def single_random_word(seed=None):
+    _np_seed(seed)
     return random_words(1, {})[0]
