@@ -81,7 +81,7 @@ Language: Rafvo
 
 If you use `abzu`, please cite it as:
 
-> Tresoldi, Tiago (2019). Enki, a system for simulating language evolution.
+> Tresoldi, Tiago (2019). Abzu, a system for simulating language evolution.
 Version 0.0.1dev. Jena. Available at https://github.com/tresoldi/abzu
 
 In BibTex:
