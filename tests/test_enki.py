@@ -8,7 +8,8 @@ test_enki
 Tests for the `enki` package.
 """
 
-# Import 3rd-party libraries
+# Import Python standard libraries
+import sys
 import unittest
 
 # Import the library being tested
