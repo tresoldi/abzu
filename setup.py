@@ -1,5 +1,6 @@
 import pathlib
-from setuptools import setup
+import setuptools
+from setuptools import setup, find_packages
 
 # The directory containing this file
 LOCAL_PATH = pathlib.Path(__file__).parent
@@ -10,8 +11,8 @@ README_FILE = (LOCAL_PATH / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="enki",
-    version="0.0.1",
-    description="Simulate language evolution.",
+    version="0.0.1dev",
+    description="System for the simulation of language evolution",
     long_description=README_FILE,
     long_description_content_type="text/markdown",
     url="https://github.com/tresoldi/enki",
@@ -22,11 +23,12 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries",
     ],
     packages=["enki", "resources"],
-    keywords=["language", "evolution", "simulation", "conlang"],
+    keywords=["linguistics", "language evolution", "simulation", "conlang"],
     include_package_data=True,
-    install_requires=["alteruphono", "ngesh", "numpy"],
+    install_requires=["ngesh", "alteruphono", "numpy"],
     entry_points={"console_scripts": ["enki=enki.__main__:main"]},
     test_suite="tests",
     tests_require=[],
