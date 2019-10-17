@@ -138,7 +138,7 @@ class TestAbzu(unittest.TestCase):
         )
 
     def test_kiss_single_random_word(self):
-        assert abzu.kiss.single_random_word(seed="abzu") == "ɔ l uː kʰ uː ɛ"
+        assert abzu.kiss.single_random_word(seed="enki") == "ɔ l uː kʰ uː ɛ"
 
 
 if __name__ == "__main__":
