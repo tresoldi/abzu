@@ -12,7 +12,7 @@ def tree_test():
 
     # TODO: need to add seed to `add_characters`
     # TODO: need to sort the taxa in output in `tree2nexus`
-    tree = ngesh.add_characters(tree, CONCEPTS, 3.0, 0.5)
+    tree = ngesh.add_characters(tree, CONCEPTS, 3.0, 0.5, seed=13)
 
     # collect all taxa and their characters, provided the characters exist
     # TODO: reuse code? already in tree2nexus
@@ -25,6 +25,18 @@ def tree_test():
     num_words = max([max(chars) for chars in data.values()]) + 1
     words = abzu.kiss.random_words(num_words, param={})
 
+    print(tree)
+    print(ngesh.tree2nexus(tree))
+    print(data)
+    print(words, len(words))
+
+    for node in tree.iter_descendants():
+        print([node.name], node.dist)
+        print(dir(node))
+
+    #output_wordlist(data, words)
+
+def output_wordlist(data, words):
     # attribute
     # TODO: copying directly here, needs sound changes, HTG, etc.
     wordlist = {
@@ -32,14 +44,11 @@ def tree_test():
         for taxon, chars in data.items()
     }
 
-    print(tree)
-    print(ngesh.tree2nexus(tree))
-    print(data)
-    print(words)
+    CONCEPTS = len(list(data.values())[0])
 
     # wordlist output
     row_id = 1
-    for taxon in wordlist:
+    for taxon in sorted(wordlist):
         for i in range(CONCEPTS):
             buf = [
                 str(row_id),
