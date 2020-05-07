@@ -45,7 +45,8 @@ def quick_test():
 
     print("--> random_global_freq()")
     base_freq = {
-        v["GRAPHEME"]: float(v["FREQUENCY"]) for v in abzu.kiss.PHONEME_FREQ.values()
+        v["GRAPHEME"]: float(v["FREQUENCY"])
+        for v in abzu.kiss.PHONEME_FREQ.values()
     }
     print("  items: %i" % len(base_freq))
     print()
@@ -60,9 +61,9 @@ def quick_test():
             for key, value in abzu.kiss.CONS_INV.items()
             if value["PATTERN"] == pattern
         }
-        inv["initials"], inv["medials"], inv["finals"] = abzu.kiss.random_cons_inv(
-            cons_distr
-        )
+        inv["initials"], inv["medials"], inv[
+            "finals"
+        ] = abzu.kiss.random_cons_inv(cons_distr)
         phonology = abzu.kiss.random_phonology(inv, param)
 
         print(
@@ -113,7 +114,9 @@ def main():
     # Define the parser for when called from command line
     parser = argparse.ArgumentParser(description="Abzu language simulation.")
     parser.add_argument(
-        "--seed", type=str, help="The RNG seed, for reproducibility. Defaults to None."
+        "--seed",
+        type=str,
+        help="The RNG seed, for reproducibility. Defaults to None.",
     )
     parser.add_argument(
         "--debug",

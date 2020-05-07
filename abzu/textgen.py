@@ -201,14 +201,18 @@ def random_species(size=1, seed=None):
     # If a label ends in "i", it will end in "is" 75% of the time, otherwise
     # in "ii"
     labels = [
-        label + "s" if (label.endswith("i") and random.random() <= 0.75) else label
+        label + "s"
+        if (label.endswith("i") and random.random() <= 0.75)
+        else label
         for label in labels
     ]
     labels = [label + "i" if label.endswith("i") else label for label in labels]
 
     # If a label ends in "a", it will end in "as" 50% of the time
     labels = [
-        label + "s" if (label.endswith("a") and random.random() <= 0.5) else label
+        label + "s"
+        if (label.endswith("a") and random.random() <= 0.5)
+        else label
         for label in labels
     ]
 
@@ -228,7 +232,9 @@ def random_species(size=1, seed=None):
     # In case the label starts with a labial plosive, there is 50% of chance
     # that it will gain an "s" in front
     labels = [
-        "s" + label if (label.startswith("p") or label.startswith("b")) else label
+        "s" + label
+        if (label.startswith("p") or label.startswith("b"))
+        else label
         for label in labels
     ]
 
@@ -240,14 +246,20 @@ def random_species(size=1, seed=None):
                 target = vowel1 + cons + cons + vowel2
 
                 labels = [
-                    label.replace(source, target) if random.random() < 0.4 else label
+                    label.replace(source, target)
+                    if random.random() < 0.4
+                    else label
                     for label in labels
                 ]
 
     # If the label is short, add a random suffix
     labels = [
         "%s%s%s"
-        % (label, random.choice(["r", "r", "l"]), random.choice(__SOUNDS["V"]) + "s")
+        % (
+            label,
+            random.choice(["r", "r", "l"]),
+            random.choice(__SOUNDS["V"]) + "s",
+        )
         if len(label) < 5
         else label
         for label in labels
@@ -256,7 +268,9 @@ def random_species(size=1, seed=None):
     # Build the actual labels from genera and epithets and return
     labels = [
         "%s %s" % (__clean_label(genus), __clean_label(epithet).lower())
-        for genus, epithet in itertools.zip_longest(labels[:size], labels[size:])
+        for genus, epithet in itertools.zip_longest(
+            labels[:size], labels[size:]
+        )
     ]
 
     return labels

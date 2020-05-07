@@ -8,10 +8,12 @@ Intended as a "Keep It Simple, Stupid" version.
 
 # Import Python standard libraries
 import csv
-import hashlib
+from hashlib import sha256
 import numpy as np
 from os import path
 import re
+
+import abzu.utils
 
 # TODO: move _RESOURCE_DIR and reading to a utils.py module
 
@@ -24,8 +26,7 @@ def read_data(filename):
     filename = path.join(_RESOURCE_DIR, filename)
 
     with open(filename) as csvfile:
-        reader = csv.DictReader(csvfile, delimiter="\t")
-        data = {row.pop("ID"): row for row in reader}
+        data = {row.pop("ID"): row for row in csv.DictReader(csvfile, delimiter="\t")}
 
     return data
 
@@ -35,21 +36,6 @@ SYLL_PATTERN = read_data("syllable_patterns.tsv")
 CONS_INV = read_data("consonant_inventories.tsv")
 PHONEME_FREQ = read_data("phoneme_frequency.tsv")
 
-# TODO: move to a utils function
-def _np_seed(seed):
-    # allows using strings as np seeds, which only takes uint32 or arrays of
-    # NOTE: won't set the seed if it is None: if you want to seed none
-    # as seed, manuallz call np.random.seed()
-    if not seed:
-        return
-    elif isinstance(seed, str):
-        _seed = np.frombuffer(
-            hashlib.sha256(seed.encode("utf-8")).digest(), dtype=np.uint32
-        )
-    else:
-        _seed = seed
-
-    np.random.seed(_seed)
 
 
 def random_vowel_inv(distr=None, seed=None):
@@ -69,17 +55,20 @@ def random_vowel_inv(distr=None, seed=None):
         # TODO: properly split with zip
         # TODO: rename frequency to weight
         # copy the inventories as a `pop`ulation
-        distr["pop"] = [VOWEL_INV[inv_id]["VOWELS"] for inv_id in sorted(VOWEL_INV)]
+        distr["pop"] = [
+            VOWEL_INV[inv_id]["VOWELS"] for inv_id in sorted(VOWEL_INV)
+        ]
 
         # get the ratio and copy the frequencies as `weights`
         weights = [
-            float(VOWEL_INV[inv_id]["FREQUENCY"]) for inv_id in sorted(VOWEL_INV)
+            float(VOWEL_INV[inv_id]["FREQUENCY"])
+            for inv_id in sorted(VOWEL_INV)
         ]
         weight_sum = sum(weights)
         distr["weights"] = [w / weight_sum for w in weights]
 
     # get a random weighted individual
-    _np_seed(seed)
+    abzu.utils.seed_rngs(seed)
     vowel_inv = np.random.choice(distr["pop"], p=distr["weights"], size=1)[0]
 
     return vowel_inv.split("|")
@@ -100,19 +89,22 @@ def random_syll_pattern(distr=None, seed=None):
         # TODO: rename frequency to weight
 
         # copy the patterns as a `pop`ulation
-        distr["pop"] = [SYLL_PATTERN[pid]["PATTERN"] for pid in sorted(SYLL_PATTERN)]
+        distr["pop"] = [
+            SYLL_PATTERN[pid]["PATTERN"] for pid in sorted(SYLL_PATTERN)
+        ]
         # distr["pop"] = [entry["PATTERN"] for entry in SYLL_PATTERN.values()]
 
         # get the ratio and copy the frequencies as `weights`
         weights = [
-            float(SYLL_PATTERN[pid]["FREQUENCY"]) for pid in sorted(SYLL_PATTERN)
+            float(SYLL_PATTERN[pid]["FREQUENCY"])
+            for pid in sorted(SYLL_PATTERN)
         ]
         # weights = [int(entry["FREQUENCY"]) for entry in SYLL_PATTERN.values()]
         weight_sum = sum(weights)
         distr["weights"] = [w / weight_sum for w in weights]
 
     # get a random weighted individual
-    _np_seed(seed)
+    abzu.utils.seed_rngs(seed)
     pat = np.random.choice(distr["pop"], p=distr["weights"], size=1)[0]
 
     return pat
@@ -136,8 +128,10 @@ def random_cons_inv(distr, seed=None):
         for distr_id in sorted(distr)
     ]
 
-    _np_seed(seed)
-    initials, medials, finals = distr_list[np.random.choice(len(distr_list), size=1)[0]]
+    abzu.utils.seed_rngs(seed)
+    initials, medials, finals = distr_list[
+        np.random.choice(len(distr_list), size=1)[0]
+    ]
 
     # Split the lists of phonemes, making sure there are no empty strings
     # in case of empty lists
@@ -154,7 +148,7 @@ def random_phonology(inventory, param, base_freq=None, seed=None):
     """
 
     # set seed
-    _np_seed(seed)
+    abzu.utils.seed_rngs(seed)
 
     # load parameters
     perturbation = param.get("perturbation", 1.5)
@@ -205,21 +199,25 @@ def random_phonology(inventory, param, base_freq=None, seed=None):
 
     # correct the new probabilities, so they sum 1.0
     new_inventory = {}
-    new_inventory["vowels"] = {k: v / sum(vowels.values()) for k, v in vowels.items()}
+    new_inventory["vowels"] = {
+        k: v / sum(vowels.values()) for k, v in vowels.items()
+    }
     new_inventory["initials"] = {
         k: v / sum(initials.values()) for k, v in initials.items()
     }
     new_inventory["medials"] = {
         k: v / sum(medials.values()) for k, v in medials.items()
     }
-    new_inventory["finals"] = {k: v / sum(finals.values()) for k, v in finals.items()}
+    new_inventory["finals"] = {
+        k: v / sum(finals.values()) for k, v in finals.items()
+    }
 
     return new_inventory
 
 
 def random_words(num_words, param, seed=None):
     # set the seed
-    _np_seed(seed)
+    abzu.utils.seed_rngs(seed)
 
     # get parameters as specified or default
     # TODO: default `no_consonant` should depend on the system entropy
@@ -233,7 +231,9 @@ def random_words(num_words, param, seed=None):
     inv = {}
     inv["vowels"] = random_vowel_inv()
     cons_distr = {
-        key: value for key, value in CONS_INV.items() if value["PATTERN"] == pattern
+        key: value
+        for key, value in CONS_INV.items()
+        if value["PATTERN"] == pattern
     }
     inv["initials"], inv["medials"], inv["finals"] = random_cons_inv(cons_distr)
     phonology = random_phonology(inv, param)
@@ -374,5 +374,5 @@ def apply_basic_phonotactics(word):
 
 # TODO: implement properly
 def single_random_word(seed=None):
-    _np_seed(seed)
+    abzu.utils.seed_rngs(seed)
     return random_words(1, {})[0]
