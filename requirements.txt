@@ -1,0 +1,3 @@
+ete3
+numpy
+alteruphono @ git+git://github.com/tresoldi/alteruphono@master#egg=alteruphono
